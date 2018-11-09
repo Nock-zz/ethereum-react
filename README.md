@@ -24,12 +24,15 @@ click on download to download an app image.
 make the app image an executable (right-click and tick box)
 
 3) Install Node.js
+
 Ubuntu
+
 curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
 
 sudo apt-get install -y nodejs
 
 Use sudo on Ubuntu or run this as root on debian
+
 sudo apt-get install -y build-essential
 
 check the install with:
