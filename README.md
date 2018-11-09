@@ -88,7 +88,7 @@ Specify your chain/network id
 4224 # Anything but 1,2,3,4,42
 
 Anything fun to embed in genesis block?
-    # Hit Enter
+leave blank    # Hit Enter
 
 What would you like to do?
 2 #manage existing genesis
