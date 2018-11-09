@@ -96,7 +96,7 @@ What would you like to do?
 2 # export genesis configuration
 
 Which file to save to? default DevChain.json
-   # Hit Enter
+leave blank to accept default   # Hit Enter
 
 Quit with Ctrl+C
 
