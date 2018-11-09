@@ -227,6 +227,55 @@ pass1234
 
 chmod + x startnode.sh
 
+11) run startnode with  
+
+./startnode.sh
+
+
+12) Start the console  
+
+geth attach  
+
+eth.accounts // lists accounts
+
+eth.coinbase // lists accounts[0]
+
+web3.fromWei(eth.getBalance(eth.coinbase), "ether");
+
+web3.fromWei(eth.getBalance(eth.accounts[1]), "ether");
+
+web3.fromWei(eth.getBalance(eth.accounts[2]), "ether");
+
+miner.stop()
+
+miner.start(2) // 2 threads
+
+net.version // gets the network id 4224
+
+personal.unlockAccount(eth.accounts[1], "pass1234", 300);  // unlocked for 300 seconds
+
+personal.unlockAccount(eth.accounts[2]) // you must entr a password at the prompt
+
+eth.sendTransaction({from:eth.coinbase, to:eth.accounts[1], value: web3.toWei(10, "ether")})
+
+eth.sendTransaction({from:eth.coinbase, to:eth.accounts[2], value: web3.toWei(10, "ether")})
+
+For additional documentation - see https://web3js.readthedocs.io/en/1.0/getting-started.html#adding-web3-js
+
+13) Install Metamask (https://metamask.io)  
+
+Create the metamask account with a random seed phrase and do not use the ganache default seed phrase.
+
+Extract the private keys of ganache and use these to create 10 new accounts on metamask.
+Alternatively get the seedphrase from metamask and use it in ganache.
+
+You can also import the accounts created in geth from the keystore using account import in metamask.
+
+
+
+
+
+
 
 
 
