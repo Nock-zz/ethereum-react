@@ -272,6 +272,272 @@ Alternatively get the seedphrase from metamask and use it in ganache.
 You can also import the accounts created in geth from the keystore using account import in metamask.
 
 
+14) Create a simple smart contract and deploy via node console
+
+First create the directory of the project:  
+
+mkdir greetings  
+
+cd greetings
+
+Set up npm:  
+
+npm init  
+
+npm install web3 solc@0.4.18
+
+Create a .sol file for the code:  
+
+atom Greetings.sol
+
+
+Enter the contract code:
+pragma solidity ^0.4.18;
+
+contract Greetings {
+  string message;
+
+  function Greetings() public {
+    message = "I'm ready!";
+  }
+
+  function setGreetings(string _message) public {
+    message = _message;
+  }
+
+  function getGreetings() public view returns (string) {
+    return message;
+  }
+
+}
+
+Compile the contract with terminal:
+
+make sure you are in the root directory of the Greetings project.  
+
+Start a node console:  
+
+$> node
+
+Require web3:  
+
+> Web3 = require('web3')  
+
+> web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545")) // This is the port of the ganache in memory instance
+
+List the accounts:  
+
+> web3.eth.accounts
+
+Require solc:  
+
+solc = require('solc');
+
+Read in the contract Greetings.sol:  
+
+sourceCode = fs.readFileSync('Greetings.sol').toString()
+
+Compile the Source Code:  
+
+compiledCode = solc.compile(sourceCode)
+
+Now pull out the contract ABI:  
+
+contractABI = JSON.parse(compiledCode.contracts[':Greetings'].interface)
+
+Now use web3.eth.contract to create a contract factory from the ABI above:  
+
+greetingsContract = web3.eth.contract(contractABI)
+
+Next extract the bytecode of the contract:  
+
+byteCode = compiledCode.contracts[:Greetings].bytecode
+
+Now Deploy the contract using the contract factory:  
+
+greetingsDeployed = greetingsContract.new({data: byteCode, from: web3.eth.accounts[0], gas: 4700000})
+
+You can check the contract in ganache but you can also check its address with:
+
+greetingsDeployed.address
+
+We now need to get an instance of the Greetings contract:
+
+greetingsInstance = greetingsContract.at(greetingsDeployed.address)
+
+With the instance we can get the message of the contract:  
+
+greetingsInstance = getGreetings()
+
+Now change the message:  
+
+greetingsInstance.setGreetings('Hello world!', {from: web3.eth.accounts[0]})
+
+The message should now be changed so check with:  
+
+greetingsInstance = getGreetings()
+
+Exit the console:  
+
+.exit
+
+15) Deploy the Greetings contract using truffle
+
+First create a new project directory GreetingsTruffle:  
+
+mkdir GreetingsTruffle
+
+cd GreetingsTruffle
+
+Set up truffle:    
+
+truffle init  
+
+Check the project:  
+
+atom .
+
+The GreetingsTruffle project has the following structure.
+
+contracts directory
+
+migrations directory
+
+test directory
+
+truffle.js //config file  
+
+In the contracts directory add in the Greetings.sol file.  
+
+In the migrations directory add in a new file:  
+
+2_deploy_contracts.js
+
+This has the following code:
+
+
+//This follows the form of the 1_initial_migration.js.  
+//N.B the path for Greetings.sol is relative to the source directory i.e. contracts  
+var Greetings = artifacts.require('./Greetings.sol');
+
+
+//N.B the deployer function is provider by truffle.  
+module.exports = function(deployer) {
+  deployer.deploy(Greetings);
+};
+
+Now we can deploy the contract to the development instance (ganache):  
+
+$> truffle develop  
+
+This starts an internal ethereum node on port 9545.
+It has 10 accounts just like ganache.
+It opens the truffle console.
+
+Now we open a second truffle console on the GreetingsTruffle project root:  
+
+$> truffle develop --log   
+
+This also connects to the truffle development node on port 9545.  
+
+We switch back to the original truffle console:  
+
+> migrate --compile-all --reset  
+// the last two flags force a recompile and a redeployment  
+
+If we switch back to the console log we can see that there are four transactions. The second and fourth are created by truffle to track the migrations and GreetingsTruffle contract deployments by updating the last_completed_migration field of the Migrations contract.
+
+In the truffle console the contract is identifed by the same name we used in the migration script (2_deploy_contracts). So as we defined var Greetings, we can use Greetings.
+
+We can get the address:  
+
+> Greetings.address
+
+By the way, we can see the compiled file in the build directory, under the file name of Greetings.json.
+
+At the very bottom you can see the network id of 4447 which is the network id of the internal truffle ethereum in memory node.
+
+We can also use web3 methods:
+
+> web3.eth.accounts  
+
+and we get all the accounts
+
+To get an instance of the contract we have to enter the following command:
+
+Greetings.deployed().then(function(instance) {app = instance;});
+
+Now we can call the getGreetings() function:  
+
+app.getGreetings();
+
+And also the setGreetings() function:
+
+app.setGreetings("Hello you all!", {from: web3.eth.accounts[0]})
+
+And we can recheck the message:
+
+app.getGreetings();
+
+We can exit the development console with:
+
+> .exit  
+
+We can also deploy to ganache.  
+First start ganache.  
+
+So we open truffle.js and we add the folliwng information:  
+module_exports = {
+networks: {
+  ganache: {
+    host: "localhost",
+    port:7545,
+    network_id: "*"
+    }
+  }
+}
+
+Now we can compile from the command prompt:  
+
+First we type the following command:  
+
+$>truffle migrate --compile-all --reset --network ganache
+
+After deployemnt we have to run the truffle console on the ganache network and to do this we use:
+
+$> truffle console --network ganache  
+
+We can now call all the functions as before:
+
+To get an instance of the contract we have to enter the same command that we used for the Truffle develop instance:  
+
+Greetings.deployed().then(function(instance) {app = instance;});
+
+
+app.getGreetings();
+
+And also the setGreetings() function:
+
+app.setGreetings("Hello you all!", {from: web3.eth.accounts[0]})
+
+And we can recheck the message:
+
+app.getGreetings();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
