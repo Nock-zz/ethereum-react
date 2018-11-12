@@ -421,12 +421,12 @@ This has the following code:
 var Greetings = artifacts.require('./Greetings.sol');
 
 
-//N.B the deployer function is provider by truffle.  
+//N.B the deployer function is provided by truffle.  
 module.exports = function(deployer) {
   deployer.deploy(Greetings);
 };
 
-Now we can deploy the contract to the development instance (ganache):  
+Now we can deploy the contract to the development instance (and also to ganache):  
 
 $> truffle develop  
 
@@ -523,6 +523,26 @@ app.setGreetings("Hello you all!", {from: web3.eth.accounts[0]})
 And we can recheck the message:
 
 app.getGreetings();
+
+Under Truffle 5 beta
+installed using:   
+sudo npm uninstall -g truffle  
+sudo npm install -g truffle@beta 
+
+
+$>truffle migrate --compile-all --reset --network ganache
+
+$>truffle console --network ganache
+
+
+const app = await Greetings.deployed();
+
+const accounts = await web3.eth.getAccounts();
+
+app.getGreetings()
+
+app.setGreetings("Hello you all!",{from: accounts[0]})
+
 
 
 
