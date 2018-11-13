@@ -405,7 +405,7 @@ migrations directory
 
 test directory
 
-truffle.js //config file  
+truffle-config.js //config file  
 
 In the contracts directory add in the Greetings.sol file.  
 
@@ -486,7 +486,7 @@ We can exit the development console with:
 We can also deploy to ganache.  
 First start ganache.  
 
-So we open truffle.js and we add the folliwng information:  
+So we open truffle-config.js and we add the folliwng information:  
 module_exports = {
 networks: {
   ganache: {
@@ -527,13 +527,16 @@ app.getGreetings();
 Under Truffle 5 beta
 installed using:   
 sudo npm uninstall -g truffle  
-sudo npm install -g truffle@beta 
+sudo npm install -g truffle@beta
+
+
 
 
 $>truffle migrate --compile-all --reset --network ganache
 
 $>truffle console --network ganache
 
+Type the following commands in the truffle console:
 
 const app = await Greetings.deployed();
 
@@ -542,6 +545,64 @@ const accounts = await web3.eth.getAccounts();
 app.getGreetings()
 
 app.setGreetings("Hello you all!",{from: accounts[0]})
+
+Add in a test file - myTests.js with the text:
+
+var Greetings = artifacts.require("./Greetings.sol");  
+
+
+
+
+contract("Greetings Unit Tests", (accounts) => {  
+
+let app;  
+
+
+beforeEach( 'set up before each test', async  () => {  
+  app = await Greetings.deployed();  
+});  
+
+
+it("should have app set to the Greetings instance", async () => {  
+
+//app = await Greetings.deployed();  
+console.log(Greetings.toJSON().contractName);  
+assert.ok(app);  
+assert.equal(Greetings.toJSON().contractName, 'Greetings');  
+});  
+
+
+
+it("should have a version of web3 1.", async () => {  
+//  console.log(web3.version);  
+  assert.equal(web3.version[0], '1', "web3 is not version 1");  
+});  
+
+it("should have an accounts[0]", () => {  
+//  console.log(accounts[0]);  
+  assert.ok(accounts[0]);  
+});  
+
+it("should have a getGreetings initially set to: I'm Ready!", async () => {  
+  let expectedGreetings = "I'm ready!"  
+//  app = await Greetings.deployed();  
+  const initialGreetings = await app.getGreetings();  
+//  console.log(initialGreetings);  
+  assert.equal(initialGreetings, expectedGreetings, "Expected Greetings does not equal initial getGreetings");  
+});  
+
+it("should be able to reset the Greetings to: Hi", async () => {  
+  //console.log(app2);  
+  let expectedGreetings = "Hi";  
+  //const app = await Greetings.deployed();  
+  await app.setGreetings("Hi", {from: accounts[0]});  
+  const resetGreetings = await app.getGreetings();  
+//  console.log(resetGreetings);  
+  assert.equal(resetGreetings, expectedGreetings, "Expected Greetings does not equal resetGreetings");  
+});  
+
+
+});    
 
 
 
