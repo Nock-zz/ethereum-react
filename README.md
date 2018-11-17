@@ -503,7 +503,7 @@ First we type the following command:
 
 $>truffle migrate --compile-all --reset --network ganache
 
-After deployemnt we have to run the truffle console on the ganache network and to do this we use:
+After deployment we have to run the truffle console on the ganache network and to do this we use:
 
 $> truffle console --network ganache  
 
@@ -546,12 +546,16 @@ app.getGreetings()
 
 app.setGreetings("Hello you all!",{from: accounts[0]})
 
+Testing can be run with the following command:
+$> truffle test --network ganache
+
+or in the console:
+> test --network ganache
+
+Of course we must first have a test file in the test directory of the project!
 Add in a test file - myTests.js with the text:
 
 var Greetings = artifacts.require("./Greetings.sol");  
-
-
-
 
 contract("Greetings Unit Tests", (accounts) => {  
 
@@ -605,7 +609,24 @@ it("should be able to reset the Greetings to: Hi", async () => {
 });    
 
 
+We can run setGreetings with a parameter for the from account.  
 
+First we must get an instance and the accounts:  
+
+const app = await Greetings.deployed();  
+
+const accounts = await web3.eth.getAccounts();  
+
+app.setGreetings("Value is changed", {from: accounts[2]})  
+
+N.B. In fact the transaction object could have been written as { from:web3.eth.accounts[2], data:null <but e.g. tokenCompiled.token.code>,  gas: 6721975, gasPrice:20000000000 }  
+
+Now balances are coming back as a string so we have to use a number of steps to get the balance:  
+let balance = await web3.eth.getBalance(accounts[2])  
+balance = web3.utils.fromWei(balance, 'ether')    
+balance = parseFloat(balance)  
+
+web3.eth.sendTransaction({from: accounts[0], to:accounts[1], value: web3.utils.toWei('5', 'ether')})
 
 
 
